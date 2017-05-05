@@ -1,0 +1,26 @@
+#!/bin/bash
+
+tfile=$(timeout 5s mktemp /tmp/foo.XXXXXXXXX)
+if [[ ! "$tfile" =~ ^/tmp/foo* ]]
+then
+    echo "Timeout in creating a temp file"
+    exit 2
+fi
+# time out returns 124, if the command is taking more time than specified
+to_result=$(timeout 5s echo "some text," > "$tfile")
+if [[ "$to_result" == 124 ]]
+then
+    echo "Timeout in writing a temp file:$to_result"
+    exit 2
+fi
+
+to1_result=$(timeout 5s rm "$tfile")
+if [[ "$to1_result" == 124 ]]
+then
+    echo "Timeout in removing a temp file"
+    exit 2
+fi
+
+echo “OK – File operations done successfully.”
+exit 0
+
